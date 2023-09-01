@@ -1,3 +1,4 @@
+import asyncHandler from "express-async-handler";
 import User from "../models/userModel.js";
 import generateToken from "./../utils/generateToken.js";
 /**
@@ -5,7 +6,7 @@ import generateToken from "./../utils/generateToken.js";
  * @route   POST /api/users/auth
  * @access  Public
  */
-const authUser = async (req, res) => {
+const authUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
   if (user && (await user.matchPassword(password))) {
@@ -15,14 +16,14 @@ const authUser = async (req, res) => {
     res.status(401);
     throw new Error("Invalid email or password");
   }
-};
+});
 
 /**
  * @desc    Register a new user
  * @route   POST /api/users
  * @access  Public
  */
-const registerUser = async (req, res) => {
+const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
 
   const userExists = await User.findOne({ email });
@@ -39,7 +40,7 @@ const registerUser = async (req, res) => {
     res.status(400);
     throw new Error("Invalid user data");
   }
-};
+});
 
 /**
  * @desc    Logout user
@@ -56,21 +57,21 @@ const logoutUser = (req, res) => {
  * @route   GET /api/users/profile
  * @access  Private
  */
-const getUserProfile = (req, res) => {
+const getUserProfile = asyncHandler((req, res) => {
   const user = {
     _id: req.user._id,
     name: req.user.name,
     email: req.user.email,
   };
   res.status(200).json({ user });
-};
+});
 
 /**
  * @desc    Update the user profile
  * @route   PUT /api/users/profile
  * @access  Private
  */
-const updateUserProfile = async (req, res) => {
+const updateUserProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
   if (user) {
     user.name = req.body.bane || user.name;
@@ -89,7 +90,7 @@ const updateUserProfile = async (req, res) => {
     res.status(404);
     throw new Error("User not found");
   }
-};
+});
 
 export {
   authUser,
